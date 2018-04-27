@@ -3,6 +3,8 @@
 // para carregar:
 //  - A lista de filmes
 //  - A introdução de cada filme, quando ele for clicado
+let audio = new Audio('https://archive.org/download/StarWarsThemeSongByJohnWilliams/Star%20Wars%20Theme%20Song%20By%20John%20Williams.mp3');
+audio.play();
 
 function obtemListaDeFilmes() {
   $.ajax({
@@ -20,7 +22,12 @@ function obtemFilme(urlDoFilme) {
     url: urlDoFilme,
     method: 'GET',
     success: function (resposta) {
-      atualizaTexto(resposta.opening_crawl);
+      let texto = 'Episode ' + converteParaRomano(resposta.episode_id) + '\n' +
+        resposta.title.toUpperCase() + '\n\n' +
+        resposta.opening_crawl;
+      atualizaTexto(texto);
+      audio.currentTime = 0;
+      audio.play();
     }
   });
 }
@@ -28,7 +35,7 @@ function obtemFilme(urlDoFilme) {
 function atualizaTexto(texto) {
   let elementoTexto = document.querySelector('.container>.flow>.reading-animation');
   elementoTexto.innerText = texto;
-
+  localStorage.setItem('ultimoFilme', texto);
 }
 
 function preencheListaDeFilmes(listaDeFilmes) {
@@ -64,3 +71,8 @@ function ordenaEpisodios(listaDeFilmes) {
 }
 
 obtemListaDeFilmes();
+let ultimoFilme = localStorage.getItem('ultimoFilme');
+if (ultimoFilme) {
+  let elementoTexto = document.querySelector('.container>.flow>.reading-animation');
+  elementoTexto.innerText = ultimoFilme;
+}
